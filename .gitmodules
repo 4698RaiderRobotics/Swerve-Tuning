@@ -1,0 +1,3 @@
+[submodule "src/Swerve"]
+	path = src/Swerve
+	url = https://github.com/4698RaiderRobotics/Swerve.git
