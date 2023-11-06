@@ -17,6 +17,8 @@ void Robot::RobotInit() {
   m_drive.StartLogging( frc::DataLogManager::GetLog() );
 
   logger.StartDataLog( frc::DataLogManager::GetLog() );
+
+  logger.LogMetadata();
 }
 
 void Robot::RobotPeriodic() {

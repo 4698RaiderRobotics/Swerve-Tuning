@@ -97,3 +97,5 @@ model {
         }
     }
 }
+
+apply from: 'buildinfo.gradle'

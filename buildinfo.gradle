@@ -1,0 +1,67 @@
+//
+//      Add the following line to the bottom of build.gradle:
+//
+//  apply from: 'buildinfo.gradle'
+//
+
+tasks.register("writeBuildInfo") {
+
+        // Write the current date/time
+   def date = new Date()
+   def filetxt = date.toString() + '\n'
+
+   // Define an output stream to write to instead of terminal
+   def stdout = new ByteArrayOutputStream()
+
+   // Execute the git command to get the Fetch remote repository
+   exec {
+      commandLine "git", "remote", "show", "-n", "origin"
+      // Write to the output stream instead of terminal
+      standardOutput = stdout
+   }
+
+   def lines = stdout.toString().split("\n")
+   def repo = "unknown"
+   for (int i = 0; i < lines.length; i++) {
+      if( lines[i].contains( "Fetch" ) ) {
+         repo = lines[i];
+         break;
+      }
+   }
+    lines = repo.split("/");
+    if( lines.length > 1 ) {
+        repo = lines[ lines.length - 2 ] + '/' + lines[ lines.length - 1 ];
+    }
+
+   filetxt += repo + '\n'
+   stdout.reset()
+
+   // Execute the git command to get the tag or branch
+   exec {
+      commandLine "git", "rev-parse", "--abbrev-ref", "HEAD"
+      // Write to the output stream instead of terminal
+      standardOutput = stdout
+   }
+
+   filetxt += stdout.toString().trim() + '\n'
+   stdout.reset()
+
+   // Execute the git command to get the version/commit info
+   exec {
+      commandLine "git", "describe", "--tags", "--always", "--dirty"
+      // Write to the output stream instead of terminal
+      standardOutput = stdout
+   }
+
+   filetxt += stdout.toString().trim()
+
+   // Create a new file
+   new File(
+      // Join project directory and deploy directory
+      projectDir.toString() + "/src/main/deploy",
+      // File name to write to
+      "buildinfo.txt"
+   ).text = filetxt // Set the contents of the file to the variable branch
+}
+
+deploy.targets.roborio.artifacts.frcStaticFileDeploy.dependsOn(writeBuildInfo)

@@ -19,9 +19,13 @@
         {
           "decKey": 71,
           "incKey": 84
+        },
+        {
+          "decKey": 72,
+          "incKey": 89
         }
       ],
-      "axisCount": 4,
+      "axisCount": 5,
       "buttonCount": 4,
       "buttonKeys": [
         90,

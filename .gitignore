@@ -173,3 +173,6 @@ out/
 
 # RoboRIO Simulation log files
 *.wpilog
+
+# Generated files
+src/main/deploy/buildinfo.txt
