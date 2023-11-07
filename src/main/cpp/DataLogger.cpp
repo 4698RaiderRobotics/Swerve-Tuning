@@ -22,6 +22,11 @@ void DataLogger::Send( std::string_view s, std::span<const double> a ) {
     le.Append( a );
 }
 
+void DataLogger::Send( std::string_view s, int val ) { 
+    wpi::log::IntegerLogEntry le{ *(log), s };
+    le.Append( val );
+}
+
 void DataLogger::Send( std::string_view s, std::string_view val ) { 
     wpi::log::StringLogEntry le{ *(log), s };
     le.Append( val );

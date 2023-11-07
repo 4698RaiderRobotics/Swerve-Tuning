@@ -37,6 +37,8 @@ class DataLogger {
 
         void Send( std::string_view s, std::string_view val );
 
+        void Send( std::string_view s, int val );
+
         void Send( std::string_view s, bool val );
  
         void LogMetadata( void );
