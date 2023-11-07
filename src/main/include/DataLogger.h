@@ -3,55 +3,47 @@
 
 #pragma once
 
-#include <fstream>
+#include <span>
 
 #include <wpi/DataLog.h>
-#include <frc/Filesystem.h>
+#include <frc/DataLogManager.h>
 
 class DataLogger {
+    private:
+        // This class is a singleton.
+        static DataLogger *singleton;
+
+        // Constructor is private
+        DataLogger() {}
     public:
-        void StartDataLog( wpi::log::DataLog &d ) { log = &d; }
 
-        void Send( std::string_view s, double val ) { 
-            wpi::log::DoubleLogEntry le{ *(log), s };
-            le.Append( val );
-        }
+        // delete copy constructor
+        DataLogger(const DataLogger& obj) = delete; 
 
-        void Send( std::string_view s, std::string_view val ) { 
-            wpi::log::StringLogEntry le{ *(log), s };
-            le.Append( val );
-        }
-
-        void LogMetadata( void ) {
-                // Open the buildinfo.txt file and write the Metadata to the log file
-            std::ifstream binfo;
-            char line[256];
-
-            binfo.open( frc::filesystem::GetDeployDirectory() + "/buildinfo.txt", std::ios::in );
-            if( binfo.is_open() ) {
-                binfo.getline( line, 255 );
-                this->SendMetadata( "BUILD_DATE", line );
-                binfo.getline( line, 255 );
-                this->SendMetadata( "GIT_REPO", line );
-                binfo.getline( line, 255 );
-                this->SendMetadata( "GIT_BRANCH", line );
-                binfo.getline( line, 255 );
-                this->SendMetadata( "GIT_VERSION", line );
-                binfo.close();
+        static DataLogger& GetInstance() {
+            // If there is no instance of class
+            // then we can create an instance.
+            if (singleton == nullptr)  {
+                singleton = new DataLogger();
+                singleton->log = &frc::DataLogManager::GetLog();
             }
-
+            
+            return *singleton;
         }
+
+        void Send( std::string_view s, double val );
+
+        void Send( std::string_view s, std::span<const double> a );
+
+        void Send( std::string_view s, std::string_view val );
+
+        void Send( std::string_view s, bool val );
+ 
+        void LogMetadata( void );
 
     private:
         wpi::log::DataLog *log;
 
-        void SendMetadata( std::string_view s, std::string_view val ) {
-                // AdvantageScope Chops off leading Character of the name so we add an underscore.
-                // Not sure why
-            std::string id = "RealMetadata/_";
-            id += s;
-            wpi::log::StringLogEntry le{ *(log), id };
-            le.Append( val );
-        }
+        void SendMetadata( std::string_view s, std::string_view val );
 
 };

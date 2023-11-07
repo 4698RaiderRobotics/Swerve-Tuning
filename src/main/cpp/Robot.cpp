@@ -4,28 +4,16 @@
 
 #include "Robot.h"
 
-#include "frc/DataLogManager.h"
-#include "frc/DriverStation.h"
+#include "DataLogger.h"
 
 void Robot::RobotInit() {
-    // Starts recording to data log
-  frc::DataLogManager::Start();
+  LoggedRobot::RobotInit();
 
-  // Record both DS control and joystick data
-  frc::DriverStation::StartDataLog( frc::DataLogManager::GetLog() );
-
-  m_drive.StartLogging( frc::DataLogManager::GetLog() );
-
-  logger.StartDataLog( frc::DataLogManager::GetLog() );
-
-  logger.LogMetadata();
 }
 
 void Robot::RobotPeriodic() {
-  logger.Send( "PDP/Bus Voltage", m_pdp.GetVoltage() );
-  logger.Send( "PDP/Total Current", m_pdp.GetTotalCurrent() );
-  logger.Send( "PDP/Temperature", m_pdp.GetTemperature() );
-  logger.Send( "PDP/Total Power", m_pdp.GetTotalPower() );
+  LoggedRobot::RobotPeriodic();
+
   m_drive.Periodic();
 }
 

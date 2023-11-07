@@ -4,15 +4,14 @@
 
 #pragma once
 
-#include <frc/TimedRobot.h>
 #include <frc/XboxController.h>
-#include <frc/PowerDistribution.h>
 
-#include "DataLogger.h"
+#include "LoggedRobot.h"
+
 #include "ControllerAxis.h"
 #include "SwerveDrive.h"
 
-class Robot : public frc::TimedRobot {
+class Robot : public LoggedRobot {
  public:
   void RobotInit() override;
   void RobotPeriodic() override;
@@ -39,8 +38,4 @@ class Robot : public frc::TimedRobot {
   ControllerAxis omega_axis{m_xbox, frc::XboxController::Axis::kRightX, true};
 
   SwerveDrive m_drive;
-
-  frc::PowerDistribution m_pdp{};
-
-  DataLogger logger;
 };
