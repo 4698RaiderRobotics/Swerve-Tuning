@@ -19,6 +19,7 @@ void Robot::RobotInit() {
   frc::SmartDashboard::PutNumber("Move Delta X", 0.0 );
   frc::SmartDashboard::PutNumber("Move Delta Y", 0.0 );
   frc::SmartDashboard::PutNumber("Move Angle", 0.0 );
+  frc::SmartDashboard::PutNumber("End Heading", 0.0 );
 
 }
 
@@ -30,8 +31,13 @@ void Robot::RobotPeriodic() {
   frc::Pose2d dashboardPose;
 
   dashboardPose.X() = units::meter_t{ frc::SmartDashboard::GetNumber("Move Delta X", 0.0 ) };
-  dashboardPose.Y() = units::meter_t{ frc::SmartDashboard::PutNumber("Move Delta Y", 0.0 ) };
-  dashboardPose.Rotation().Degrees() = units::degree_t{ frc::SmartDashboard::PutNumber("Move Angle", 0.0 ) };
+  dashboardPose.Y() = units::meter_t{ frc::SmartDashboard::GetNumber("Move Delta Y", 0.0 ) };
+  dashboardPose.Rotation().Degrees() = units::degree_t{ frc::SmartDashboard::GetNumber("Move Angle", 0.0 ) };
+
+  frc::SmartDashboard::PutNumber("Current Pose X", m_drive.GetPose().X().value() );
+  frc::SmartDashboard::PutNumber("Current Pose Y", m_drive.GetPose().Y().value() );
+  frc::SmartDashboard::PutNumber("Current Pose Heading", m_drive.GetPose().Rotation().Degrees().value() );
+
 
   if( m_move_delta != dashboardPose ) {
     m_move_delta = dashboardPose;
@@ -40,6 +46,7 @@ void Robot::RobotPeriodic() {
       frc::Pose2d endPose;
       endPose = startPose + frc::Transform2d{ m_move_delta.Translation(), m_move_delta.Rotation() };
       m_finishHeading = startPose.Rotation() + m_move_delta.Rotation();
+      frc::SmartDashboard::PutNumber("End Heading", m_finishHeading.Degrees().value() );
 
       auto linear_tangent =  frc::Rotation2d{ m_move_delta.X().value(), m_move_delta.Y().value()};
 
