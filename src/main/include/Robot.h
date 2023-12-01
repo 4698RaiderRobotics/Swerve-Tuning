@@ -5,6 +5,9 @@
 #pragma once
 
 #include <frc/XboxController.h>
+#include <frc/trajectory/Trajectory.h>
+#include <frc/trajectory/TrajectoryConfig.h>
+#include <frc/trajectory/TrajectoryGenerator.h>
 
 #include "LoggedRobot.h"
 
@@ -38,4 +41,12 @@ class Robot : public LoggedRobot {
   ControllerAxis omega_axis{m_xbox, frc::XboxController::Axis::kRightX, true};
 
   SwerveDrive m_drive;
+
+  frc::Pose2d m_move_delta;
+  frc::Rotation2d m_finishHeading;
+  units::second_t m_trajStart{ 0_s };
+
+  frc::Trajectory m_trajectory;
+  frc::TrajectoryConfig m_config{ 2_mps, 2_mps_sq };
+
 };
