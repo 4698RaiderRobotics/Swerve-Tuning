@@ -34,8 +34,12 @@ class Robot : public LoggedRobot {
   void SimulationInit() override;
   void SimulationPeriodic() override;
 
+  void ProfiledMove( units::second_t );
+  void ConstructTrajectory();
+  void ConstructProfiles();
+
  private:
-  frc::XboxController m_xbox{0};
+  frc::XboxController m_xbox{1};
   ControllerAxis vx_axis{m_xbox, frc::XboxController::Axis::kLeftY, true};
   ControllerAxis vy_axis{m_xbox, frc::XboxController::Axis::kLeftX, true};
   ControllerAxis omega_axis{m_xbox, frc::XboxController::Axis::kRightX, true};
@@ -45,8 +49,17 @@ class Robot : public LoggedRobot {
   frc::Pose2d m_move_delta;
   frc::Rotation2d m_finishHeading;
   units::second_t m_trajStart{ 0_s };
+  units::second_t m_trajLength{ 0_s };
 
   frc::Trajectory m_trajectory;
   frc::TrajectoryConfig m_config{ 2_mps, 2_mps_sq };
 
+  frc::TrapezoidProfile<units::meters>::Constraints m_linearConstraints{ 3_mps, 1.5_mps_sq };
+  frc::TrapezoidProfile<units::degrees>::Constraints m_omegaConstraints{ 360_deg_per_s, 90_deg_per_s_sq };
+  
+  frc::TrapezoidProfile<units::meters> m_xProfile{ m_linearConstraints, {0.0_m}, {0.0_m} };
+  frc::TrapezoidProfile<units::meters> m_yProfile{ m_linearConstraints, {0.0_m}, {0.0_m} };
+  frc::TrapezoidProfile<units::degrees> m_omegaProfile{ m_omegaConstraints, {0.0_deg}, {0.0_deg} };
+
+  bool m_useTrajectory{false};
 };
