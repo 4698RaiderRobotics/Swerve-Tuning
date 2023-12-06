@@ -6,11 +6,12 @@
 #include <wpi/DataLog.h>
 #include <frc/Filesystem.h>
 #include <frc/DataLogManager.h>
+#include <networktables/DoubleTopic.h>
+#include <networktables/DoubleArrayTopic.h>
 
 #include "DataLogger.h"
 
 DataLogger* DataLogger::singleton = nullptr; 
-
 
 void DataLogger::Send( std::string_view s, double val ) { 
     wpi::log::DoubleLogEntry le{ *(log), s };
@@ -35,6 +36,20 @@ void DataLogger::Send( std::string_view s, std::string_view val ) {
 void DataLogger::Send( std::string_view s, bool val ) {
     wpi::log::BooleanLogEntry le{ *(log), s };
     le.Append( val );
+}
+
+void DataLogger::SendNT( std::string s, double val ) {
+    if( !nt_map.contains( s ) ) {
+        nt_map[s] = nt_inst.GetDoubleTopic( s ).GenericPublish( "double" );
+    }
+    nt_map[s].SetDouble( val );
+}
+
+void DataLogger::SendNT( std::string s, std::span<const double> a ) {
+    if( !nt_map.contains( s ) ) {
+        nt_map[s] = nt_inst.GetDoubleArrayTopic( s ).GenericPublish( "double" );
+    }
+    nt_map[s].SetDoubleArray( a );
 }
 
 void DataLogger::LogMetadata( void ) {

@@ -5,11 +5,15 @@
 #include <frc/RobotController.h>
 #include <frc/DataLogManager.h>
 #include <frc/DriverStation.h>
+#include <frc/livewindow/LiveWindow.h>
 
 #include "DataLogger.h"
 #include "LoggedRobot.h"
 
 void LoggedRobot::RobotInit() {
+        // Disable LiveWindow Telemetry
+    frc::LiveWindow::DisableAllTelemetry();
+    
         // Start the log manager
     frc::DataLogManager::Start();
 
