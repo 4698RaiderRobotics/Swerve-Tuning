@@ -49,8 +49,8 @@ class Robot : public LoggedRobot {
 
   frc::Pose2d m_move_delta;
   frc::Rotation2d m_finishHeading;
-  units::second_t m_trajStart{ 0_s };
-  units::second_t m_trajLength{ 0_s };
+  units::second_t m_moveStart{ 0_s };
+  units::second_t m_moveLength{ 0_s };
 
   frc::Trajectory m_trajectory;
   frc::TrajectoryConfig m_config{ 2_mps, 2_mps_sq };
