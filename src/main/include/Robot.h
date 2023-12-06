@@ -8,6 +8,7 @@
 #include <frc/trajectory/Trajectory.h>
 #include <frc/trajectory/TrajectoryConfig.h>
 #include <frc/trajectory/TrajectoryGenerator.h>
+#include <units/angular_acceleration.h>
 
 #include "LoggedRobot.h"
 

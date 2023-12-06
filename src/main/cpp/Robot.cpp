@@ -87,6 +87,10 @@ void Robot::TeleopPeriodic() {
       if( m_useTrajectory ) {
           // Drive along trajectory.
         auto goal = m_trajectory.Sample( elapsed );
+        frc::SmartDashboard::PutNumber("Trajectory X Setpoint", goal.pose.X().value());
+        frc::SmartDashboard::PutNumber("Trajectory Y Setpoint", goal.pose.Y().value());
+        frc::SmartDashboard::PutNumber("Trajectory Theta Setpoint", goal.pose.Rotation().Degrees().value());
+
         m_drive.DriveTrajectory( goal, m_finishHeading );
       } else {
           // Do profiled moves for X, Y, and theta.
@@ -108,29 +112,29 @@ void Robot::SimulationInit() {}
 void Robot::SimulationPeriodic() {}
 
 void Robot::ConstructTrajectory() {
-    frc::Pose2d startPose = m_drive.GetPose();
-    frc::Pose2d endPose;
-    endPose = startPose + frc::Transform2d{ m_move_delta.Translation(), m_move_delta.Rotation() };
-    m_finishHeading = startPose.Rotation() + m_move_delta.Rotation();
-    frc::SmartDashboard::PutNumber("End Heading", m_finishHeading.Degrees().value() );
+  frc::Pose2d startPose = m_drive.GetPose();
+  frc::Pose2d endPose;
+  endPose = startPose + frc::Transform2d{ m_move_delta.Translation(), m_move_delta.Rotation() };
+  m_finishHeading = startPose.Rotation() + m_move_delta.Rotation();
+  frc::SmartDashboard::PutNumber("End Heading", m_finishHeading.Degrees().value() );
 
-    auto linear_tangent =  frc::Rotation2d{ m_move_delta.X().value(), m_move_delta.Y().value()};
+  auto linear_tangent =  frc::Rotation2d{ m_move_delta.X().value(), m_move_delta.Y().value()};
 
-    frc::Pose2d midPose = startPose + frc::Transform2d{ m_move_delta.Translation() / 2.0, m_move_delta.Rotation() };;
+  frc::Pose2d midPose = startPose + frc::Transform2d{ m_move_delta.Translation() / 2.0, m_move_delta.Rotation() };;
 
-    fmt::print( "  Start Pose: {:9.4}, {:9.4}, Heading {:9.4}\n", 
-                startPose.X(), startPose.Y(), startPose.Rotation().Degrees() );
-    fmt::print( "    End Pose: {:9.4}, {:9.4}, Heading {:9.4}\n", 
-                endPose.X(), endPose.Y(), endPose.Rotation().Degrees() );
+  fmt::print( "  Start Pose: {:9.4}, {:9.4}, Heading {:9.4}\n", 
+              startPose.X(), startPose.Y(), startPose.Rotation().Degrees() );
+  fmt::print( "    End Pose: {:9.4}, {:9.4}, Heading {:9.4}\n", 
+              endPose.X(), endPose.Y(), endPose.Rotation().Degrees() );
 
-  
-    m_trajectory = frc::TrajectoryGenerator::GenerateTrajectory({
-      {startPose.X(), startPose.Y(), linear_tangent}, 
-      {midPose.X(), midPose.Y(), linear_tangent},
-      {endPose.X(), endPose.Y(), linear_tangent}},
-      m_config );
 
-    fmt::print("Trajectory time: {}\n", m_trajectory.TotalTime());
+  m_trajectory = frc::TrajectoryGenerator::GenerateTrajectory({
+    {startPose.X(), startPose.Y(), linear_tangent}, 
+    {midPose.X(), midPose.Y(), linear_tangent},
+    {endPose.X(), endPose.Y(), linear_tangent}},
+    m_config );
+
+  fmt::print("Trajectory time: {}\n", m_trajectory.TotalTime());
 }
 
 void Robot::ConstructProfiles() {
@@ -148,6 +152,14 @@ void Robot::ProfiledMove( units::second_t elapsed ) {
   frc::TrapezoidProfile<units::meters>::State xSetpoint = m_xProfile.Calculate( elapsed );
   frc::TrapezoidProfile<units::meters>::State ySetpoint = m_yProfile.Calculate( elapsed );
   frc::TrapezoidProfile<units::degrees>::State omegaSetpoint = m_omegaProfile.Calculate( elapsed );
+
+  frc::SmartDashboard::PutNumber("Trapezoid X Setpoint", xSetpoint.position.value());
+  frc::SmartDashboard::PutNumber("Trapezoid Y Setpoint", ySetpoint.position.value());
+  frc::SmartDashboard::PutNumber("Trapezoid Theta Setpoint", omegaSetpoint.position.value());
+
+  frc::SmartDashboard::PutNumber("Trapezoid X Velocity Setpoint", xSetpoint.velocity.value());
+  frc::SmartDashboard::PutNumber("Trapezoid Y Velocity Setpoint", ySetpoint.velocity.value());
+  frc::SmartDashboard::PutNumber("Trapezoid Omega Setpoint", omegaSetpoint.velocity.value());
 
   frc::ChassisSpeeds speeds;
   speeds.vx = xSetpoint.velocity;
