@@ -46,12 +46,12 @@ void Robot::RobotPeriodic() {
 
   if( m_move_delta != dashboardPose ) {
     m_move_delta = dashboardPose;
-    if( m_move_delta.Translation().Norm() > 0.001_m ) {
-      if( m_useTrajectory ) {
+    if( m_useTrajectory ) {
+      if( m_move_delta.Translation().Norm() > 0.001_m ) {
         ConstructTrajectory();
-      } else {
-        ConstructProfiles();
-      }
+      } 
+    } else {
+      ConstructProfiles();
     }
   }
 }
@@ -66,6 +66,7 @@ void Robot::TeleopPeriodic() {
     if( m_moveStart < 20_ms ) {
       m_moveStart = frc::Timer::GetFPGATimestamp();
       m_drive.ResetPose( {0_m, 0_m} );
+      m_drive.ResetGyro(0);
     }
   }
 
@@ -157,6 +158,11 @@ void Robot::ConstructProfiles() {
   m_omegaProfile = frc::TrapezoidProfile<units::degrees> { m_omegaConstraints, {m_move_delta.Rotation().Degrees()}, 
                                                           {startPose.Rotation().Degrees()} };
 
+  xSetpoint = {startPose.X()};
+  ySetpoint = {startPose.Y()};
+  omegaSetpoint = {startPose.Rotation().Degrees()};
+
+
   if( m_xProfile.TotalTime() > m_yProfile.TotalTime() ) {
     m_moveLength = m_xProfile.TotalTime();
   } else {
@@ -170,9 +176,15 @@ void Robot::ConstructProfiles() {
 }
 
 void Robot::ProfiledMove( units::second_t elapsed ) {
-  frc::TrapezoidProfile<units::meters>::State xSetpoint = m_xProfile.Calculate( elapsed );
-  frc::TrapezoidProfile<units::meters>::State ySetpoint = m_yProfile.Calculate( elapsed );
-  frc::TrapezoidProfile<units::degrees>::State omegaSetpoint = m_omegaProfile.Calculate( elapsed );
+  m_xProfile = frc::TrapezoidProfile<units::meters> { m_linearConstraints, {m_move_delta.X()}, {xSetpoint} };
+  m_yProfile = frc::TrapezoidProfile<units::meters> { m_linearConstraints, {m_move_delta.Y()}, {ySetpoint} };
+  m_omegaProfile = frc::TrapezoidProfile<units::degrees> { m_omegaConstraints, {m_move_delta.Rotation().Degrees()}, 
+                                                          {omegaSetpoint} };
+
+  xSetpoint = m_xProfile.Calculate(20_ms);
+  ySetpoint = m_yProfile.Calculate(20_ms);
+  omegaSetpoint = m_omegaProfile.Calculate(20_ms);
+  
 
   frc::SmartDashboard::PutNumber("Profiled X Setpoint", xSetpoint.position.value());
   frc::SmartDashboard::PutNumber("Profiled Y Setpoint", ySetpoint.position.value());

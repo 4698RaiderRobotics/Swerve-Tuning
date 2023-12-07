@@ -56,11 +56,15 @@ class Robot : public LoggedRobot {
   frc::TrajectoryConfig m_config{ 2_mps, 2_mps_sq };
 
   frc::TrapezoidProfile<units::meters>::Constraints m_linearConstraints{ 3_mps, 1.5_mps_sq };
-  frc::TrapezoidProfile<units::degrees>::Constraints m_omegaConstraints{ 360_deg_per_s, 90_deg_per_s_sq };
+  frc::TrapezoidProfile<units::degrees>::Constraints m_omegaConstraints{ 360_deg_per_s, 180_deg_per_s_sq };
   
   frc::TrapezoidProfile<units::meters> m_xProfile{ m_linearConstraints, {0.0_m}, {0.0_m} };
   frc::TrapezoidProfile<units::meters> m_yProfile{ m_linearConstraints, {0.0_m}, {0.0_m} };
   frc::TrapezoidProfile<units::degrees> m_omegaProfile{ m_omegaConstraints, {0.0_deg}, {0.0_deg} };
+
+  frc::TrapezoidProfile<units::meters>::State xSetpoint;
+  frc::TrapezoidProfile<units::meters>::State ySetpoint;
+  frc::TrapezoidProfile<units::degrees>::State omegaSetpoint;
 
   bool m_useTrajectory{false};
 };
