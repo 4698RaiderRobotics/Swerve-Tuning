@@ -66,7 +66,7 @@ void Robot::TeleopPeriodic() {
     if( m_moveStart < 20_ms ) {
       m_moveStart = frc::Timer::GetFPGATimestamp();
       m_drive.ResetPose( {0_m, 0_m} );
-      m_drive.ResetGyro(0);
+      m_drive.ResetGyro(0_deg);
     }
   }
 
@@ -92,7 +92,7 @@ void Robot::TeleopPeriodic() {
       }
     }
   } else {
-    m_drive.ArcadeDrive( vx_axis.GetAxis(), vy_axis.GetAxis(), omega_axis.GetAxis(), false );
+    m_drive.ArcadeDrive( vx_axis.GetAxis(), vy_axis.GetAxis(), omega_axis.GetAxis(), true );
   }
 }
 
@@ -184,7 +184,6 @@ void Robot::ProfiledMove( units::second_t elapsed ) {
   xSetpoint = m_xProfile.Calculate(20_ms);
   ySetpoint = m_yProfile.Calculate(20_ms);
   omegaSetpoint = m_omegaProfile.Calculate(20_ms);
-  
 
   frc::SmartDashboard::PutNumber("Profiled X Setpoint", xSetpoint.position.value());
   frc::SmartDashboard::PutNumber("Profiled Y Setpoint", ySetpoint.position.value());
